@@ -2,6 +2,9 @@ package cn.jpush.mr;
 
 /**
  * Created by wmky_kk on 2017-08-21.
+ * http://hadoop.apache.org/docs/stable/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html
+ * 教程中conf.getBoolean("wordcount.skip.patterns",true)应改为conf.getBoolean("wordcount.skip.patterns",false)否则运行时如果没有带上-skip那个参数，则会报URI空指针错误。
+ * 还有一点明显的排版错误，或运算是两条连着的竖杠，而教程中竖杠中有个空格。
  */
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -52,17 +55,19 @@ public class WordCount2 {
              */
             conf = context.getConfiguration();
             caseSensitive = conf.getBoolean("wordcount.case.sensitive", true);
-            /*if (conf.getBoolean("wordcount.skip.patterns", true)) {
-                URI[] patternsURIs = Job.getInstance(conf).getCacheFiles();
+
+
+            if (conf.getBoolean("wordcount.skip.patterns", false)) {
+                URI[] patternsURIs = Job.getInstance(conf).getCacheFiles(); // Job对象调用继承于JobContextImpl父类的公开方法getCacheFiles()方法，得到URI数组对象
                 for (URI patternsURI : patternsURIs) {
                     Path patternsPath = new Path(patternsURI.getPath());
                     String patternsFileName = patternsPath.getName().toString();
                     parseSkipFile(patternsFileName);
                 }
-            }*/
+            }
         }
 
-        /*private void parseSkipFile(String fileName) {
+        private void parseSkipFile(String fileName) {
             try {
                 fis = new BufferedReader(new FileReader(fileName));
                 String pattern = null;
@@ -73,7 +78,7 @@ public class WordCount2 {
                 System.err.println("Caught exception while parsing the cached file '"
                         + StringUtils.stringifyException(ioe));
             }
-        }*/
+        }
 
         @Override
         public void map(Object key, Text value, Context context
@@ -81,9 +86,9 @@ public class WordCount2 {
 
             String line = (caseSensitive) ?
                     value.toString() : value.toString().toLowerCase(); // 若行有大写则转换为小写
-            /*for (String pattern : patternsToSkip) {
+            for (String pattern : patternsToSkip) {
                 line = line.replaceAll(pattern, "");  // 满足patternsToSkip的行就替换为空串
-            }*/
+            }
             StringTokenizer itr = new StringTokenizer(line);
             while (itr.hasMoreTokens()) {
                 word.set(itr.nextToken());
@@ -93,6 +98,11 @@ public class WordCount2 {
                         CountersEnum.INPUT_WORDS.toString());
                 counter.increment(1);
             }
+        }
+
+        @Override
+        public void cleanup(Context context) throws IOException,InterruptedException{
+
         }
     }
 
