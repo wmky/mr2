@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ArrUtil {
-    /**
+    /**ArrToMap
      * 将传入的数组转化为key-value的xing
      * @param
      */

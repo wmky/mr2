@@ -126,8 +126,7 @@ public class WechatEvent {
                         CountersEnum.REGULAR_INPUT_LOGS.toString());
                 counterRegular.increment(1);
             } else {
-                System.out.println(line);
-                logger.info("youck " + line);
+                logger.info(line);
                 Counter counterIrregular = context.getCounter(CountersEnum.class.getName(),
                 CountersEnum.IRREGULAR_INPUT_LOGS.toString());
                 counterIrregular.increment(1);
@@ -142,10 +141,10 @@ public class WechatEvent {
 
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
-
         Job job = Job.getInstance(conf, "WechatEvent");
         job.setJarByClass(WechatEvent.class);
         job.setMapperClass(TokenizerMapper.class);
+        job.setNumReduceTasks(0);
         job.setOutputKeyClass(NullWritable.class);
         job.setOutputValueClass(Text.class);
 
