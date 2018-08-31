@@ -1,4 +1,4 @@
-package cn.jpush.mr;
+package com.leyoujia.mr2;
 
 
 /**
@@ -8,7 +8,7 @@ package cn.jpush.mr;
 
 import java.io.IOException;
 import java.util.Map;
-import cn.jpush.util.ArrUtil;
+import com.leyoujia.util.ArrUtil;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
@@ -30,6 +30,7 @@ public class WechatEvent {
         static enum CountersEnum { IRREGULAR_INPUT_LOGS,REGULAR_INPUT_LOGS };
 
         private String SpecialChar = "\u0001";
+        private String SplitChar = "\\|\\|";
         private Configuration conf;
 
         @Override
@@ -49,9 +50,9 @@ public class WechatEvent {
         ) throws IOException, InterruptedException {
             Text rValue = new Text();
             String line = value.toString();
-            String[] arr =  line.split("\\|\\|");
+            String[] arr =  line.split(SplitChar);
             if ( arr.length == 19 ){
-                String et = arr[0];
+                String it = arr[0];
                 String ip = arr[1];
                 String logsource = arr[2];
                 String uuid = arr[3];
@@ -75,7 +76,7 @@ public class WechatEvent {
                 String osv = ArrUtil.ArrToMap(arr[18]).get("osv");
                 String uid = ArrUtil.ArrToMap(arr[18]).get("uid");
                 StringBuffer columns = new StringBuffer();
-                columns.append(et);
+                columns.append(it);
                 columns.append(SpecialChar);
                 columns.append(ip);
                 columns.append(SpecialChar);

@@ -1,4 +1,4 @@
-package cn.jpush.util;
+package com.leyoujia.util;
 
 import java.util.HashMap;
 import java.util.Map;
