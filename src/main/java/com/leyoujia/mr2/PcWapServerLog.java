@@ -70,6 +70,7 @@ public class PcWapServerLog {
                 // TODO 注意json key对应的value是数值类型还是String类型或者Object等.否则ColumnChange中return会报错
                 JsonObject jsonObj =jsonParser.parse(json.trim()).getAsJsonObject();
                 StringBuffer columns = new StringBuffer();
+                columns.append(ColumnChange(jsonObj,"accessAddress"));
                 columns.append(SpecialChar);
                 columns.append(ColumnChange(jsonObj,"cityCode"));
                 columns.append(SpecialChar);
