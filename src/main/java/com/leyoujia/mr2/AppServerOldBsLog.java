@@ -8,6 +8,7 @@ package com.leyoujia.mr2;
 import com.google.common.base.Strings;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.leyoujia.util.JsonUtil;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
@@ -21,11 +22,10 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import com.leyoujia.util.JsonUtil;
 
 
-public class AppClientOldLog {
-    private static Logger logger = LogManager.getLogger(AppClientOldLog.class);
+public class AppServerOldBsLog {
+    private static Logger logger = LogManager.getLogger(AppServerOldBsLog.class);
 
     public static class TokenizerMapper
             extends Mapper<Object, Text, NullWritable, Text> {
@@ -54,23 +54,59 @@ public class AppClientOldLog {
                 StringBuffer columns = new StringBuffer();
                 columns.append(ColumnChange(jsonObj,"aid"));
                 columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"bi"));
+                columns.append(ColumnChange(jsonObj,"browser"));
                 columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"eis"));
+                columns.append(ColumnChange(jsonObj,"carriers"));
                 columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"evs"));
+                columns.append(ColumnChange(jsonObj,"channel"));
                 columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"it"));
+                columns.append(ColumnChange(jsonObj,"clientId"));
                 columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"mi"));
+                columns.append(ColumnChange(jsonObj,"cost"));
                 columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"pis"));
+                columns.append(ColumnChange(jsonObj,"distinct_id"));
                 columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"ssid"));
+                columns.append(ColumnChange(jsonObj,"ip"));
                 columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"uuid"));
+                columns.append(ColumnChange(jsonObj,"latitude"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"longitude"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"method"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"mobileBrand"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"mobileModel"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"mobileNo"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"network_type"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"np"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"nt"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"params"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"referer"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"request_time"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"response_time"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"sSID"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"totalRecord"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"uDID"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"uUID"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"uri"));
                 columns.append(SpecialChar);
                 columns.append(ColumnChange(jsonObj,"ver"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"versionsCode"));
                 columns.append(SpecialChar);
                 rValue.set(columns.toString());
                 context.write(NullWritable.get(),rValue);
@@ -87,14 +123,8 @@ public class AppClientOldLog {
 
         private String ColumnChange(JsonObject jsonObj, String column) {
             String res ="";
-            if (column.equals("bi") || column.equals("mi") ){
-                res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column).getAsJsonObject().toString()) ? jsonObj.get(column).getAsJsonObject().toString() : EMPTY;
-            } else if (column.equals("eis") || column.equals("evs") || column.equals("pis")){
-                res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column).getAsJsonArray().toString()) ? jsonObj.get(column).getAsJsonArray().toString() : EMPTY;
-            } else {
-                res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column)
+            res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column)
                         .getAsString().trim()) ? jsonObj.get(column).getAsString().trim() : EMPTY;
-            }
             return res;
         }
 
@@ -106,8 +136,8 @@ public class AppClientOldLog {
 
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
-        Job job = Job.getInstance(conf, "AppClientOldLog");
-        job.setJarByClass(AppClientOldLog.class);
+        Job job = Job.getInstance(conf, "AppServerOldBsLog");
+        job.setJarByClass(AppServerOldBsLog.class);
         job.setMapperClass(TokenizerMapper.class);
         job.setNumReduceTasks(0);
         job.setOutputKeyClass(NullWritable.class);

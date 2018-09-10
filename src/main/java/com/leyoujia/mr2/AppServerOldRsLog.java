@@ -8,6 +8,7 @@ package com.leyoujia.mr2;
 import com.google.common.base.Strings;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.leyoujia.util.JsonUtil;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
@@ -21,11 +22,10 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import com.leyoujia.util.JsonUtil;
 
 
-public class AppClientOldLog {
-    private static Logger logger = LogManager.getLogger(AppClientOldLog.class);
+public class AppServerOldRsLog {
+    private static Logger logger = LogManager.getLogger(AppServerOldRsLog.class);
 
     public static class TokenizerMapper
             extends Mapper<Object, Text, NullWritable, Text> {
@@ -52,25 +52,11 @@ public class AppClientOldLog {
                 // TODO 注意json key对应的value是数值类型还是String类型或者Object等.否则ColumnChange中return会报错
                 JsonObject jsonObj =jsonParser.parse(json.trim()).getAsJsonObject();
                 StringBuffer columns = new StringBuffer();
-                columns.append(ColumnChange(jsonObj,"aid"));
+                columns.append(ColumnChange(jsonObj,"headers"));
                 columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"bi"));
+                columns.append(ColumnChange(jsonObj,"client"));
                 columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"eis"));
-                columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"evs"));
-                columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"it"));
-                columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"mi"));
-                columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"pis"));
-                columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"ssid"));
-                columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"uuid"));
-                columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"ver"));
+                columns.append(ColumnChange(jsonObj,"parameters"));
                 columns.append(SpecialChar);
                 rValue.set(columns.toString());
                 context.write(NullWritable.get(),rValue);
@@ -87,13 +73,8 @@ public class AppClientOldLog {
 
         private String ColumnChange(JsonObject jsonObj, String column) {
             String res ="";
-            if (column.equals("bi") || column.equals("mi") ){
+            if (column.equals("headers") || column.equals("client") || column.equals("parameters") ){
                 res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column).getAsJsonObject().toString()) ? jsonObj.get(column).getAsJsonObject().toString() : EMPTY;
-            } else if (column.equals("eis") || column.equals("evs") || column.equals("pis")){
-                res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column).getAsJsonArray().toString()) ? jsonObj.get(column).getAsJsonArray().toString() : EMPTY;
-            } else {
-                res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column)
-                        .getAsString().trim()) ? jsonObj.get(column).getAsString().trim() : EMPTY;
             }
             return res;
         }
@@ -106,8 +87,8 @@ public class AppClientOldLog {
 
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
-        Job job = Job.getInstance(conf, "AppClientOldLog");
-        job.setJarByClass(AppClientOldLog.class);
+        Job job = Job.getInstance(conf, "AppServerOldRsLog");
+        job.setJarByClass(AppServerOldRsLog.class);
         job.setMapperClass(TokenizerMapper.class);
         job.setNumReduceTasks(0);
         job.setOutputKeyClass(NullWritable.class);

@@ -9,6 +9,7 @@ import java.io.IOException;
 import com.google.common.base.Strings;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.leyoujia.util.JsonUtil;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
@@ -32,18 +33,12 @@ public class PcWapServerLog {
         static enum CountersEnum {IRREGULAR_INPUT_LOGS, REGULAR_INPUT_LOGS}
         private static final JsonParser jsonParser = new JsonParser();
         private String SpecialChar = "\u0001";
-        private String SplitChar = "\\|\\|";
         private String EMPTY = "";
         private Configuration conf;
 
         @Override
         public void setup(Context context) throws IOException,
                 InterruptedException {
-            /**
-             * JobContext接口中抽象方法
-             * Return the configuration for the job.
-             * @return the shared configuration object  共享配置
-             */
             conf = context.getConfiguration();
 
         }
@@ -53,20 +48,7 @@ public class PcWapServerLog {
         ) throws IOException, InterruptedException {
             Text rValue = new Text();
             try{
-                String rawLine = value.toString();
-                String json = "";
-                 //输入的字符串最后一个位置的值是否是“]”或者"}"
-                if (rawLine.substring(rawLine.length() - 1, rawLine.length()).equals("]") ||
-                        rawLine.substring(rawLine.length() - 1, rawLine.length()).equals("}")) {
-                    if (rawLine.indexOf("[") >= 0 && rawLine.indexOf("]") >= 0
-                            && (rawLine.indexOf("[") < rawLine.indexOf("{"))) {
-                        json = rawLine.substring(rawLine.indexOf("["),
-                                rawLine.length());
-                    } else if (rawLine.indexOf("{") >= 0 && rawLine.indexOf("}") > 0) {
-                        json = rawLine.substring(rawLine.indexOf("{"),
-                                rawLine.length());
-                    }
-                }
+                String json = JsonUtil.getJson(value.toString());
                 // TODO 注意json key对应的value是数值类型还是String类型或者Object等.否则ColumnChange中return会报错
                 JsonObject jsonObj =jsonParser.parse(json.trim()).getAsJsonObject();
                 StringBuffer columns = new StringBuffer();
@@ -120,7 +102,7 @@ public class PcWapServerLog {
                         CountersEnum.REGULAR_INPUT_LOGS.toString());
                 counterRegular.increment(1);
             }catch (Exception e){
-                logger.error(value.toString() + e + "\n");
+                logger.error(value.toString() + "\n" + e );
                 Counter counterIrregular = context.getCounter(CountersEnum.class.getName(),
                         CountersEnum.IRREGULAR_INPUT_LOGS.toString());
                 counterIrregular.increment(1);
@@ -130,10 +112,10 @@ public class PcWapServerLog {
         private String ColumnChange(JsonObject jsonObj, String column) {
             String res ="";
             if (column.equals("requestMap") || column.equals("resultMap")){
-                res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column).getAsJsonObject().toString()) ? jsonObj.get(column).getAsJsonObject().toString() : "";
+                res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column).getAsJsonObject().toString()) ? jsonObj.get(column).getAsJsonObject().toString() : EMPTY;
             } else {
                 res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column)
-                        .getAsString().trim()) ? jsonObj.get(column).getAsString().trim() : "";
+                        .getAsString().trim()) ? jsonObj.get(column).getAsString().trim() : EMPTY;
             }
             return res;
         }

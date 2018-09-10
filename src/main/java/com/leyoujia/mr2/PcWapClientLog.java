@@ -8,6 +8,7 @@ package com.leyoujia.mr2;
 import com.google.common.base.Strings;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.leyoujia.util.JsonUtil;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
@@ -17,15 +18,17 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import com.leyoujia.util.JsonUtil;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
-public class AppClientOldLog {
-    private static Logger logger = LogManager.getLogger(AppClientOldLog.class);
+public class PcWapClientLog {
+    private static Logger logger = LogManager.getLogger(PcWapClientLog.class);
 
     public static class TokenizerMapper
             extends Mapper<Object, Text, NullWritable, Text> {
@@ -35,6 +38,8 @@ public class AppClientOldLog {
         private String SpecialChar = "\u0001";
         private String EMPTY = "";
         private Configuration conf;
+
+
 
         @Override
         public void setup(Context context) throws IOException,
@@ -48,29 +53,38 @@ public class AppClientOldLog {
         ) throws IOException, InterruptedException {
             Text rValue = new Text();
             try{
+                Pattern pattern = Pattern.compile("(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2}):(\\d{2})");
+                Matcher m = pattern.matcher(value.toString());
+                String dateStr = "";
+                while (m.find()) {
+                    dateStr += m.group() + "\u0001";
+                }
+                String it = dateStr.split("\u0001")[0];
                 String json = JsonUtil.getJson(value.toString());
                 // TODO 注意json key对应的value是数值类型还是String类型或者Object等.否则ColumnChange中return会报错
                 JsonObject jsonObj =jsonParser.parse(json.trim()).getAsJsonObject();
                 StringBuffer columns = new StringBuffer();
-                columns.append(ColumnChange(jsonObj,"aid"));
+                columns.append(it);
                 columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"bi"));
+                columns.append(ColumnChange(jsonObj,"ip"));
                 columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"eis"));
+                columns.append(ColumnChange(jsonObj,"uid"));
                 columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"evs"));
+                columns.append(ColumnChange(jsonObj,"sid"));
                 columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"it"));
+                columns.append(ColumnChange(jsonObj,"pid"));
                 columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"mi"));
+                columns.append(ColumnChange(jsonObj,"loc"));
                 columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"pis"));
+                columns.append(ColumnChange(jsonObj,"ref"));
                 columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"ssid"));
+                columns.append(ColumnChange(jsonObj,"nua"));
                 columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"uuid"));
+                columns.append(ColumnChange(jsonObj,"scs"));
                 columns.append(SpecialChar);
                 columns.append(ColumnChange(jsonObj,"ver"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"utm"));
                 columns.append(SpecialChar);
                 rValue.set(columns.toString());
                 context.write(NullWritable.get(),rValue);
@@ -87,10 +101,8 @@ public class AppClientOldLog {
 
         private String ColumnChange(JsonObject jsonObj, String column) {
             String res ="";
-            if (column.equals("bi") || column.equals("mi") ){
+            if (column.equals("requestMap") || column.equals("resultMap")){
                 res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column).getAsJsonObject().toString()) ? jsonObj.get(column).getAsJsonObject().toString() : EMPTY;
-            } else if (column.equals("eis") || column.equals("evs") || column.equals("pis")){
-                res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column).getAsJsonArray().toString()) ? jsonObj.get(column).getAsJsonArray().toString() : EMPTY;
             } else {
                 res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column)
                         .getAsString().trim()) ? jsonObj.get(column).getAsString().trim() : EMPTY;
@@ -106,8 +118,8 @@ public class AppClientOldLog {
 
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
-        Job job = Job.getInstance(conf, "AppClientOldLog");
-        job.setJarByClass(AppClientOldLog.class);
+        Job job = Job.getInstance(conf, "PcWapClientLog");
+        job.setJarByClass(PcWapClientLog.class);
         job.setMapperClass(TokenizerMapper.class);
         job.setNumReduceTasks(0);
         job.setOutputKeyClass(NullWritable.class);
