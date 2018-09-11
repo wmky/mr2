@@ -53,7 +53,8 @@ public class AppClientNewPageLog {
             String line = value.toString();
             String[] arr =  line.split(SplitChar);
             if ( arr.length == 19 ){
-                String it = arr[0];
+                String itComplex = arr[0];
+                String it =itComplex.contains("\u0000") ? itComplex.split("\u0000")[itComplex.split("\u0000").length-1]:itComplex;
                 String ip = arr[1];
                 String logsource = arr[2];
                 String uuid = arr[3];

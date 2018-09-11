@@ -27,7 +27,7 @@ public class WechatEvent {
     public static class TokenizerMapper
             extends Mapper<Object, Text, NullWritable, Text>{
 
-        static enum CountersEnum { IRREGULAR_INPUT_LOGS,REGULAR_INPUT_LOGS };
+        static enum CountersEnum { IRREGULAR_INPUT_LOGS,REGULAR_INPUT_LOGS,INPUT_LOGS};
 
         private String SpecialChar = "\u0001";
         private String SplitChar = "\\|\\|";
@@ -51,8 +51,14 @@ public class WechatEvent {
             Text rValue = new Text();
             String line = value.toString();
             String[] arr =  line.split(SplitChar);
+            Counter counterInputLog = context.getCounter(CountersEnum.class.getName(),
+                    CountersEnum.INPUT_LOGS.toString());
+            counterInputLog.increment(1);
             if ( arr.length == 19 ){
-                String it = arr[0];
+                // 解决||分割日志中hdfs dfs text 读取tar.gz文件时,第一行自动添加如下字符做前缀
+                // ./wechat-event.log.2018-08-300000644000000000000000026770744013342012177014077 0ustar  rootroot
+                String itComplex = arr[0];
+                String it =itComplex.contains("\u0000") ? itComplex.split("\u0000")[itComplex.split("\u0000").length-1]:itComplex;
                 String ip = arr[1];
                 String logsource = arr[2];
                 String uuid = arr[3];
@@ -127,10 +133,10 @@ public class WechatEvent {
                         CountersEnum.REGULAR_INPUT_LOGS.toString());
                 counterRegular.increment(1);
             } else {
-                logger.info(line);
                 Counter counterIrregular = context.getCounter(CountersEnum.class.getName(),
                 CountersEnum.IRREGULAR_INPUT_LOGS.toString());
                 counterIrregular.increment(1);
+                logger.info("iregular " + counterInputLog.getValue() + "$$" + line);
             }
         }
 
