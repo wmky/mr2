@@ -48,9 +48,10 @@ public class AppServerOldBsLog {
         ) throws IOException, InterruptedException {
             Text rValue = new Text();
             try{
-                String json = JsonUtil.getJson(value.toString());
+                String json = JsonUtil.getJson(value.toString()).replace("\\n","");
                 // TODO 注意json key对应的value是数值类型还是String类型或者Object等.否则ColumnChange中return会报错
                 JsonObject jsonObj =jsonParser.parse(json.trim()).getAsJsonObject();
+
                 StringBuffer columns = new StringBuffer();
                 columns.append(ColumnChange(jsonObj,"aid"));
                 columns.append(SpecialChar);
