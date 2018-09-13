@@ -66,17 +66,13 @@ public class PcWapClientLog {
                 StringBuffer columns = new StringBuffer();
                 columns.append(it);
                 columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"ip"));
+                columns.append(ColumnChange(jsonObj,"loc"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"ref"));
                 columns.append(SpecialChar);
                 columns.append(ColumnChange(jsonObj,"uid"));
                 columns.append(SpecialChar);
                 columns.append(ColumnChange(jsonObj,"sid"));
-                columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"pid"));
-                columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"loc"));
-                columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"ref"));
                 columns.append(SpecialChar);
                 columns.append(ColumnChange(jsonObj,"nua"));
                 columns.append(SpecialChar);
@@ -84,7 +80,21 @@ public class PcWapClientLog {
                 columns.append(SpecialChar);
                 columns.append(ColumnChange(jsonObj,"ver"));
                 columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"wid"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"fid"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"evk"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"evv"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"ip "));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"pid"));
+                columns.append(SpecialChar);
                 columns.append(ColumnChange(jsonObj,"utm"));
+                columns.append(SpecialChar);
+                columns.append(ColumnChange(jsonObj,"mac"));
                 columns.append(SpecialChar);
                 rValue.set(columns.toString());
                 context.write(NullWritable.get(),rValue);
@@ -101,12 +111,7 @@ public class PcWapClientLog {
 
         private String ColumnChange(JsonObject jsonObj, String column) {
             String res ="";
-            if (column.equals("requestMap") || column.equals("resultMap")){
-                res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column).getAsJsonObject().toString()) ? jsonObj.get(column).getAsJsonObject().toString() : EMPTY;
-            } else {
-                res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column)
-                        .getAsString().trim()) ? jsonObj.get(column).getAsString().trim() : EMPTY;
-            }
+            res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column).getAsString().trim()) ? jsonObj.get(column).getAsString().trim() : EMPTY;
             return res;
         }
 
