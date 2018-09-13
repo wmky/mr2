@@ -73,9 +73,8 @@ public class AppServerOldRsLog {
 
         private String ColumnChange(JsonObject jsonObj, String column) {
             String res ="";
-            if (column.equals("headers") || column.equals("client") || column.equals("parameters") ){
-                res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column).getAsJsonObject().toString()) ? jsonObj.get(column).getAsJsonObject().toString() : EMPTY;
-            }
+            res = jsonObj.has(column)&& !jsonObj.get(column).isJsonNull()&& !Strings.isNullOrEmpty(jsonObj.get(column).toString())
+                    ? jsonObj.get(column).toString() : EMPTY;
             return res;
         }
 
