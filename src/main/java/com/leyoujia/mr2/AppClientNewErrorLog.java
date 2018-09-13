@@ -55,7 +55,7 @@ public class AppClientNewErrorLog {
             if ( arr.length == 19 ){
                 String itComplex = arr[0];
                 String it =itComplex.contains("\u0000") ? itComplex.split("\u0000")[itComplex.split("\u0000").length-1]:itComplex;
-                String ip = arr[1];
+                String ip = arr[1].trim();
                 String logsource = arr[2];
                 String uuid = arr[3];
                 String aid = arr[4];
