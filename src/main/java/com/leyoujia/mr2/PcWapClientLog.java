@@ -88,7 +88,7 @@ public class PcWapClientLog {
                 columns.append(SpecialChar);
                 columns.append(ColumnChange(jsonObj,"evv"));
                 columns.append(SpecialChar);
-                columns.append(ColumnChange(jsonObj,"ip "));
+                columns.append(ColumnChange(jsonObj,"ip"));
                 columns.append(SpecialChar);
                 columns.append(ColumnChange(jsonObj,"pid"));
                 columns.append(SpecialChar);
