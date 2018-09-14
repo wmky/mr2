@@ -111,8 +111,12 @@ public class PcWapClientLog {
 
         private String ColumnChange(JsonObject jsonObj, String column) {
             String res ="";
-            res = jsonObj.has(column)&& !jsonObj.get(column).isJsonNull()&& !Strings.isNullOrEmpty(jsonObj.get(column).toString())
-                        ? jsonObj.get(column).toString() : EMPTY;
+            if (column.equals("evv")){
+                res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column).toString()) ? jsonObj.get(column).toString() : EMPTY;
+            } else {
+                res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column)
+                        .getAsString().trim()) ? jsonObj.get(column).getAsString().trim() : EMPTY;
+            }
             return res;
         }
 
