@@ -22,6 +22,8 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class AppServerOldRsLog {
@@ -48,10 +50,19 @@ public class AppServerOldRsLog {
         ) throws IOException, InterruptedException {
             Text rValue = new Text();
             try{
+                Pattern pattern = Pattern.compile("(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2}):(\\d{2})");
+                Matcher m = pattern.matcher(value.toString());
+                String dateStr = "";
+                while (m.find()) {
+                    dateStr += m.group() + "\u0001";
+                }
+                String it = dateStr.split("\u0001")[0];
                 String json = JsonUtil.getJson(value.toString());
                 // TODO 注意json key对应的value是数值类型还是String类型或者Object等.否则ColumnChange中return会报错
                 JsonObject jsonObj =jsonParser.parse(json.trim()).getAsJsonObject();
                 StringBuffer columns = new StringBuffer();
+                columns.append(it);
+                columns.append(SpecialChar);
                 columns.append(ColumnChange(jsonObj,"headers"));
                 columns.append(SpecialChar);
                 columns.append(ColumnChange(jsonObj,"client"));
