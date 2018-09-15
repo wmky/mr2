@@ -113,6 +113,9 @@ public class PcWapClientLog {
             String res ="";
             if (column.equals("evv")){
                 res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column).toString()) ? jsonObj.get(column).toString() : EMPTY;
+                if (res.indexOf("\"") == 0 && res.lastIndexOf("\"") + 1 == res.length()){
+                    res=res.substring(1,res.length()-1);
+                }
             } else {
                 res = jsonObj.has(column) && !jsonObj.get(column).isJsonNull() && !Strings.isNullOrEmpty(jsonObj.get(column)
                         .getAsString().trim()) ? jsonObj.get(column).getAsString().trim() : EMPTY;
